@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Document</title>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|PT+Sans" rel="stylesheet">
+</head>
+<!--Для простоты проверки задания разместим CSS тут-->
+<style>
+body {
+	font-family: 'Open Sans', sans-serif
+}
+.result {
+    border: 1px solid black;
+    font-family: 'Open Sans', sans-serif;
+    padding: 2% 0 5% 0;
+    white-space: pre-wrap;
+    background: #2f2f2f;
+    min-height: 300px;
+    color: white;
+}
+button {
+	cursor: pointer;
+	margin:0;
+	padding: 0;
+}
+select {
+	background: #fff;
+	border:1px solid #a0a0a0;
+	font-size: 14px;
+	text-align: left;
+	width:150px;
+}
+.delete {
+	border: none;
+	font-size: 16px;
+	color: #ca4444;
+}
+
+input {
+	background: #fff;
+	border:1px solid #a0a0a0;
+	font-size: 14px;
+	text-align: left;
+	width:130px;
+}	
+.noActive {
+	opacity:0.5;
+	cursor: default;
+}
+.finalBtn {
+	color:black;
+	background: #fff;
+	padding: 5px;
+	font-size: 14px;
+}
+.finalBtn:hover {
+	background: #7e80ff;
+	color:white;
+	padding: 5px;
+	}
+.addBtn {
+	border: none;
+	color: #7e80ff;
+	font-size: 14px;
+}
+</style>
+
+<body>
+<div id="app" :key="componentKey">
+<div id="forCopy" class="paste">
+<div id="filters" class="fil">
+
+<template id="field1">
+<select v-model="selected">
+  <option v-for="option in pole1" :value="option.value">
+    {{ option.text }}
+  </option>
+</select>
+</template>
+
+<template id="field2" v-if='selected == 1'>
+ <select name="list2">
+  <option v-for="option in pole2" :value="option.value">
+    {{ option.text }}
+  </option>
+ </select>
+</template>
+
+<template id="field3" v-if='selected == 2'>
+ <select name="list3">
+  <option v-for="option in pole3" :value="option.value">
+    {{ option.text }}
+  </option>
+ </select>
+</template>
+
+<template id="inp1" v-if='selected == 1'>
+	<input type="text" placeholder="Введите текст">
+	<button class="delete noActive" v-on:click="deletBtn" disabled="">x</button>
+</template>
+
+<template id="inp2" v-if='selected == 2'>
+	<input type="number" placeholder="Введите число">
+	<button class="delete noActive" v-on:click="deletBtn" disabled="">x</button>
+</template>
+</div>
+</div>
+<br>
+
+<button id="add" class="addBtn" type="button" v-on:click="copy">+ Add condition</button>
+<br><br>
+<hr>
+<button id="applyBtn" class="finalBtn" type="button" v-on:click="apply">Apply</button>
+<button id="clear" class="finalBtn" type="button" v-on:click="clear">Clear filter</button>
+<br>
+<h2 align="center">Результат</h2>
+<div class="result">
+</div>
+
+<script type="text/javascript">
+	for (let i = 0; i < document.querySelectorAll('.delete').length; i++)
+		document.querySelectorAll('.delete')[i].disabled = true;
+
+new Vue({
+  el: '#app',
+  data: {
+    selected: '1',
+    componentKey: 0,
+    pole1: [
+      { text: 'Text field', value: '1'},
+      { text: 'Number field', value: '2'},
+    ],
+    pole2: [
+      { text: 'Containing'},
+      { text: 'Exactly matching'},
+           { text: 'Begins with'},
+      { text: 'Ends with'}
+    ],
+     pole3: [
+       { text: 'Equal'},
+      { text: 'Greater than'},
+        { text: 'Less than'}
+    ],
+  },
+
+    methods: {
+     	clear () {
+     		this.componentKey += 1;
+     		this.selected = 1;
+     	},
+
+     	apply() {
+     		let text = [];
+     		let number = [];
+     			for (let x = 0; x < document.querySelectorAll('.fil').length; x++) {
+     				if (document.querySelectorAll('.fil')[x].children[0].options.selectedIndex == 0) {
+     					text.push({ operation: document.querySelectorAll('.fil')[x].children[1].selectedOptions[0].label,value: document.querySelectorAll('.fil')[x].children[2].value });
+
+     				} 
+     				else if (document.querySelectorAll('.fil')[x].children[0].options.selectedIndex == 1) {
+     					number.push({ operation: document.querySelectorAll('.fil')[x].children[1].selectedOptions[0].label,value: document.querySelectorAll('.fil')[x].children[2].value });
+     				}
+     			}
+     		console.log(text);
+     		console.log(number);
+     		str1 = JSON.stringify(text,null, 3).toLowerCase().replace(/\"([^(\")"]+)\":/g,"$1:");
+     		str2 = JSON.stringify(number,null, 4).toLowerCase().replace(/\"([^(\")"]+)\":/g,"$1:");
+    		document.querySelector('.result').innerHTML = "{" + "<br/>" + "text: " + str1 + "<br/>" + "number: " + str2 + "<br/>" + "}"; 
+     	},
+
+     	deletBtn(e) {
+     		const btn = e.target.closest('.delete');
+     		if (!btn) {
+			    return;
+			  }
+			btn.parentElement.remove();
+			 	let filterCount = document.querySelectorAll('.fil').length;
+				if (filterCount == 1) {
+					for (let i = 0; i < filterCount; i++)
+						document.querySelectorAll('.delete')[i].disabled = true;
+						document.querySelectorAll('.delete')[0].classList.add("noActive");
+					}
+			     		},
+
+     	copy() {
+     		let newElement = document.createElement('div');
+			newElement.id = 'addFilter';
+			document.querySelector(".paste").appendChild(newElement);
+
+			new Vue({
+			  el: '#addFilter',
+			  data: {
+			    selected: '1',
+				pole1: [
+			      { text: 'Text field', value: '1'},
+			      { text: 'Number field', value: '2'},
+			    ],
+			    pole2: [
+			      { text: 'Containing'},
+			      { text: 'Exactly matching'},
+			           { text: 'Begins with'},
+			      { text: 'Ends with'}
+			    ],
+			     pole3: [
+			       { text: 'Equal'},
+			      { text: 'Greater than'},
+			        { text: 'Less than'}
+			    ],
+			  },
+
+			  methods: {
+	     		deletBtn(e) {
+	     		const btn = e.target.closest('.delete');
+	     		if (!btn) {
+				    return;
+				  }
+				btn.parentElement.remove();
+			 	let filterCount = document.querySelectorAll('.fil').length;
+					if (filterCount == 1) {
+						for (let i = 0; i < filterCount; i++) {
+							document.querySelectorAll('.delete')[i].classList.add("noActive");
+							document.querySelectorAll('.delete')[i].disabled = true;
+							document.querySelector('.addBtn').classList.add("noActive");
+					}
+				} 
+					if (filterCount == 10) {
+						document.querySelector('.addBtn').disabled = true;
+					} 
+					else if (filterCount < 10) {
+						document.querySelector('.addBtn').disabled = false;
+						document.querySelector('.addBtn').classList.remove("noActive");
+					}
+			     		}
+			     	},
+
+			    template: '<div id="filters" class="fil"><template id="field1"><select v-model="selected"><option v-for="option in pole1" :value="option.value">{{ option.text }}</option></select></template>&nbsp;<template v-if="selected == 1" id="field2"><select name="list2"><option v-for="option in pole2" :value="option.value">{{ option.text }}</option></select></template><template id="field3" v-if="selected == 2"><select name="list3"><option v-for="option in pole3" :value="option.value">{{ option.text }}</option></select></template>&nbsp;<template id="inp1" v-if="selected == 1"><input type="text" placeholder="Введите текст">&nbsp;<button v-on:click="deletBtn" class="delete" disabled="">x</button></template><template id="inp2" v-if="selected == 2"><input type="number" type="text" placeholder="Введите число">&nbsp;<button class="delete" v-on:click="deletBtn" disabled="">x</button></template></div>'
+
+			})
+
+				let filterCount = document.querySelectorAll('.fil').length;
+
+					if (filterCount == 10) {
+						document.querySelector('.addBtn').disabled = true;
+						document.querySelector('.addBtn').classList.add("noActive");
+					} 
+					else if (filterCount < 10) {
+						document.querySelector('.addBtn').disabled = false;
+						document.querySelector('.addBtn').classList.remove("noActive");
+					}
+					if (filterCount > 0) {
+						for (let i = 0; i < filterCount; i++) {
+							document.querySelectorAll('.delete')[i].disabled = false;
+							document.querySelectorAll('.delete')[i].classList.remove("noActive");
+					} 
+				}
+     		}
+    }
+})
+</script>
+</body>
+</html>

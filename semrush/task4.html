@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	
+	<script>
+
+// существует встроенный метод bind, благодаря которому жестко привязывается контекст к функции.
+
+// в коде ниже видим эмуляцию bind, аналог метода 'своими руками'.
+
+// после вызова bind сохраняем аргументы в args (после 2-го через slice)
+// создаем обертку function() для фиксации контекста
+// в переменную 'a' добавляем аргументы через concat
+// передаем вызов функции (method) с контекстом и общим массивом аргументов
+
+		function bind(method, context) {
+			var args = Array.prototype.slice.call(arguments, 2);
+			return function() {
+				var a = args.concat(Array.prototype.slice.call(arguments, 0));
+				return method.apply(context, a)
+			}
+		}
+
+// пример
+
+		var cube = {
+		  side: 10,
+		  sqArea: function() {
+		    alert( Math.pow(this.side,3) );
+		  }
+		};
+
+		setTimeout( bind(cube.sqArea, cube), 500); // 1000
+
+	</script>
+</body>
+</html>

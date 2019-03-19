@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+<style>
+  button {
+    padding: 20px;
+    cursor: pointer;
+    background: tomato;
+    color:white;
+</style>
+
+<div id="func1">
+  <p>
+    inArray(15, [1, 10, 145, 8])
+  </p>
+  <button id="func1" onclick="inArray(15, [1, 10, 145, 8])">Проверить</button>
+</div>
+<br><hr><br>
+<div id="func2">
+  <p>
+    [23, 674, 4, 12].inArray(4)
+  </p>
+  <button id="func2" onclick="[23, 674, 4, 12].inArray(4)">Проверить</button>
+</div>
+
+<script>
+  function inArray(arg, arr) {
+    let result;
+      for (let i = 0; i < arr.length; i++) {
+        if (arg === arr[i]) {
+          result = true;
+          alert('Результат === ' + result)
+          return result
+        } else {result = false}
+    }
+      alert('Результат === ' + result)
+}
+
+  Array.prototype.inArray = function(arg) {
+    let result;
+      for (var i = 0; i < this.length; i++) {
+        if (arg === this[i]) {
+          result = true;
+          alert('Результат === ' + result)
+          return result
+        } else {result = false}
+    }
+      alert('Результат === ' + result)
+}
+</script>
+</body>
+</html>
